@@ -345,7 +345,11 @@ fi
 getDistribution(){
     if [ "${releasefile}" = "/etc/os-release" ]; then
         . /etc/os-release
-        distribution=${NAME}
+        if [ "${NAME}" = "Ubuntu" -a -d "/usr/share/doc/xubuntu-core" ]; then
+            distribution="Xubuntu"
+        else
+            distribution=${NAME}
+        fi
     else
         if [ "${LSB_RELEASE}" = "" ]; then
             if [ -r "${LSB_FILE}" ]; then
