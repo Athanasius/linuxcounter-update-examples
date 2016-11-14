@@ -342,10 +342,28 @@ if [ ${wrongcmd} -eq 1 ]; then
     exit 1
 fi
 
+# Work-around for Ubuntu based distributions that (arguably) don't declare
+# themselves properly
+getDistributionUbuntuVariant() {
+    # From SubOptimal
+    if [ -d "/usr/share/doc/xubuntu-core" ]; then
+        echo "Xubuntu"
+    elif [ -f "/etc/linuxmint/info" ]; then
+        echo "Linux Mint"
+    else
+        echo "${@}"
+    fi
+}
+
 getDistribution(){
     if [ "${releasefile}" = "/etc/os-release" ]; then
         . /etc/os-release
         distribution=${NAME}
+
+        if [ "${distribution}" == "Ubuntu" ]; then
+            distribution="$(getDistributionUbuntuVariant "${distribution}")"
+        fi
+
     else
         if [ "${LSB_RELEASE}" = "" ]; then
             if [ -r "${LSB_FILE}" ]; then
@@ -402,6 +420,14 @@ getDistribution(){
     echo ${distribution}
 }
 
+getDistribVersionUbuntuVariant() {
+    if [ -f "/etc/linuxmint/info" ]; then
+        ${SED} -n -e '/\(RELEASE=\|CODENAME=\)/s#.*=##p' /etc/linuxmint/info|tr '\n' ' '
+    else
+        echo "${@}"
+    fi
+}
+
 getDistribVersion(){
     if [ "${LSB_RELEASE}" = "" ]; then
         if [ -r "${LSB_FILE}" ]; then
@@ -450,6 +476,10 @@ getDistribVersion(){
         if [ "${releasefile}" = "/etc/os-release" ]; then
             . /etc/os-release
             distribversion=${VERSION}
+
+            if [ "${NAME}" == "Ubuntu" ]; then
+                distribversion="$(getDistribVersionUbuntuVariant "${distribversion}")"
+            fi
         else
             distribversion=$(${LSB_RELEASE} -rs)
         fi
