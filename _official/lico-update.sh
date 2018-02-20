@@ -863,7 +863,7 @@ if [ ${showhelp} -eq 1 ]; then
     echo ""
     echo "   -cu          Use this to uninstall the cronjob (or at job)"
     echo ""
-    echo "   -h           Well, you've just used that switch, no?"
+    echo "   -h           Prints this help page."
     echo "   -v           This gives you the version of this script"
     echo ""
     echo "   -update      Get and install the most recent version of this script (may need sudo!)"
