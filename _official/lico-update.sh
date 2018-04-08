@@ -319,6 +319,7 @@ uninstallcron=0
 showhelp=0
 showversion=0
 doupdate=0
+rescan=0
 wrongcmd=0
 while [ $# -gt 0 ]
 do
@@ -331,13 +332,14 @@ do
         x-hx)           showhelp=1;;
         x-vx)           showversion=1;;
         x-updatex)      doupdate=1;;
+        x-rx)           rescan=1;;
         *)              wrongcmd=1;;
     esac
     shift
 done
 
 if [ ${wrongcmd} -eq 1 ]; then
-    echo " Usage:  ${SCRIPTNAME} [-i|-s|-m|-ci|-cu|-h|-v|-update]"
+    echo " Usage:  ${SCRIPTNAME} [-i|-s|-m|-ci|-cu|-h|-v|-r|-update]"
     echo " Use -h to get more help."
     exit 1
 fi
@@ -863,6 +865,9 @@ if [ ${showhelp} -eq 1 ]; then
     echo ""
     echo "   -cu          Use this to uninstall the cronjob (or at job)"
     echo ""
+    echo "   -r           This will rescan the system and replace the current configuration" 
+    echo "                with the scanned data."
+    echo ""
     echo "   -h           Well, you've just used that switch, no?"
     echo "   -v           This gives you the version of this script"
     echo ""
@@ -884,6 +889,11 @@ if [ ${uninstallcron} -eq 1 ]; then
 fi
 if [ ${doupdate} -eq 1 ]; then
     updateScript
+fi
+if [ ${rescan} -eq 1 ]; then
+    echo "> Scanning this system..."
+    echo ""
+    scanSystem
 fi
 if [ ${showdata} -eq 1 ]; then
     echo "> Showing the current configuration and exiting..."
