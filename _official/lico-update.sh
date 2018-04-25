@@ -10,8 +10,15 @@
 #bash_version    : GNU bash, Version 4.3.11(1)-release (x86_64-pc-linux-gnu)
 #==============================================================================
 
-lico_script_version="0.0.4"
-lico_script_name="lico-update.sh"
+export LANG=C
+export PATH="${HOME}/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:${PATH}"
+
+MYPATH=$(cd `dirname "${0}"` && pwd)/`basename "${0}"`
+MYNAME=$( basename "${0}" )
+
+
+lico_script_version="0.0.5"
+lico_script_name="${MYNAME}"
 
 apiurl="http://api.linuxcounter.net/v1"
 
@@ -21,6 +28,7 @@ export LANG=C
 export PATH="${HOME}/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:${PATH}"
 
 MYPATH=$(cd `dirname "${0}"` && pwd)/`basename "${0}"`
+MYNAME=$( basename "${0}" )
 
 isBusyBox=$( [ $( find --help 2>&1 3>&1 4>&1 | head -n 1 | cut -d " " -f 1 ) = "BusyBox" ] && echo true || echo false )
 
@@ -859,7 +867,7 @@ uninstallCronjob(){
 }
 
 updateScript(){
-    ${WGET} -O /tmp/lico-update.sh 'https://raw.githubusercontent.com/christinloehner/linuxcounter-update-examples/master/_official/lico-update.sh'
+    ${WGET} --no-check-certificate -O /tmp/lico-update.sh 'https://raw.githubusercontent.com/christinloehner/linuxcounter-update-examples/master/_official/lico-update.sh'
     if [ -w ${MYPATH} ]; then
         mv /tmp/lico-update.sh ${MYPATH}
         chmod +x ${MYPATH}
