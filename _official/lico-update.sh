@@ -358,12 +358,11 @@ getDistributionUbuntuVariant() {
 getDistribution(){
     if [ "${releasefile}" = "/etc/os-release" ]; then
         . /etc/os-release
-        distribution=${NAME}
-
-        if [ "${distribution}" == "Ubuntu" ]; then
-            distribution="$(getDistributionUbuntuVariant "${distribution}")"
+        if [ "${NAME}" = "Ubuntu" -a -d "/usr/share/doc/xubuntu-core" ]; then
+            distribution="Xubuntu"
+        else
+            distribution=${NAME}
         fi
-
     else
         if [ "${LSB_RELEASE}" = "" ]; then
             if [ -r "${LSB_FILE}" ]; then
@@ -852,9 +851,8 @@ uninstallCronjob(){
 }
 
 updateScript(){
-    whoami=$( whoami )
     ${WGET} -O /tmp/lico-update.sh 'https://raw.githubusercontent.com/alexloehner/linuxcounter-update-examples/master/_official/lico-update.sh'
-    if [ "${whoami}" = "root" ]; then
+    if [ -w ${MYPATH} ]; then
         mv /tmp/lico-update.sh ${MYPATH}
         chmod +x ${MYPATH}
     else
