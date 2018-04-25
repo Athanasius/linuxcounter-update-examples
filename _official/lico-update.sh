@@ -344,10 +344,27 @@ if [ ${wrongcmd} -eq 1 ]; then
     exit 1
 fi
 
+# Work-around for Ubuntu based distributions that (arguably) don't declare
+# themselves properly
+getDistributionUbuntuVariant() {
+    # From SubOptimal
+    if [ -d "/usr/share/doc/xubuntu-core" ]; then
+        echo "Xubuntu"
+    elif [ -f "/etc/linuxmint/info" ]; then
+        echo "Linux Mint"
+    else
+        echo "${@}"
+    fi
+}
+
 getDistribution(){
     if [ "${releasefile}" = "/etc/os-release" ]; then
         . /etc/os-release
-        distribution=${NAME}
+        if [ "${NAME}" = "Ubuntu" -a -d "/usr/share/doc/xubuntu-core" ]; then
+            distribution="Xubuntu"
+        else
+            distribution=${NAME}
+        fi
     else
         if [ "${LSB_RELEASE}" = "" ]; then
             if [ -r "${LSB_FILE}" ]; then
@@ -377,6 +394,9 @@ getDistribution(){
                         /etc/debian_version)
                             distribution="Debian GNU/Linux"
                             ;;
+                        /etc/devuan_version)
+                            distribution="Devuan GNU/Linux"
+                            ;;
                         /etc/GoboLinuxVersion)
                             distribution="GoboLinux"
                             ;;
@@ -404,6 +424,14 @@ getDistribution(){
     echo ${distribution}
 }
 
+getDistribVersionUbuntuVariant() {
+    if [ -f "/etc/linuxmint/info" ]; then
+        ${SED} -n -e '/\(RELEASE=\|CODENAME=\)/s#.*=##p' /etc/linuxmint/info|tr '\n' ' '
+    else
+        echo "${@}"
+    fi
+}
+
 getDistribVersion(){
     if [ "${LSB_RELEASE}" = "" ]; then
         if [ -r "${LSB_FILE}" ]; then
@@ -423,6 +451,9 @@ getDistribVersion(){
                     release=$( ${GREP} 'version *=' ${releasefile} | ${HEAD} -n 1 )
                     ;;
                 /etc/debian_version)
+                    release=$( ${CAT} ${releasefile} )
+                    ;;
+                /etc/devuan_version)
                     release=$( ${CAT} ${releasefile} )
                     ;;
                 /etc/GoboLinuxVersion)
@@ -452,6 +483,10 @@ getDistribVersion(){
         if [ "${releasefile}" = "/etc/os-release" ]; then
             . /etc/os-release
             distribversion=${VERSION}
+
+            if [ "${NAME}" == "Ubuntu" ]; then
+                distribversion="$(getDistribVersionUbuntuVariant "${distribversion}")"
+            fi
         else
             distribversion=$(${LSB_RELEASE} -rs)
         fi
@@ -824,9 +859,8 @@ uninstallCronjob(){
 }
 
 updateScript(){
-    whoami=$( whoami )
     ${WGET} -O /tmp/lico-update.sh 'https://raw.githubusercontent.com/alexloehner/linuxcounter-update-examples/master/_official/lico-update.sh'
-    if [ "${whoami}" = "root" ]; then
+    if [ -w ${MYPATH} ]; then
         mv /tmp/lico-update.sh ${MYPATH}
         chmod +x ${MYPATH}
     else
@@ -869,6 +903,7 @@ if [ ${showhelp} -eq 1 ]; then
     echo "                with the scanned data."
     echo ""
     echo "   -h           Well, you've just used that switch, no?"
+    echo ""
     echo "   -v           This gives you the version of this script"
     echo ""
     echo "   -update      Get and install the most recent version of this script (may need sudo!)"
