@@ -859,7 +859,7 @@ uninstallCronjob(){
 }
 
 updateScript(){
-    ${WGET} -O /tmp/lico-update.sh 'https://raw.githubusercontent.com/alexloehner/linuxcounter-update-examples/master/_official/lico-update.sh'
+    ${WGET} -O /tmp/lico-update.sh 'https://raw.githubusercontent.com/christinloehner/linuxcounter-update-examples/master/_official/lico-update.sh'
     if [ -w ${MYPATH} ]; then
         mv /tmp/lico-update.sh ${MYPATH}
         chmod +x ${MYPATH}
@@ -899,7 +899,7 @@ if [ ${showhelp} -eq 1 ]; then
     echo ""
     echo "   -cu          Use this to uninstall the cronjob (or at job)"
     echo ""
-    echo "   -r           This will rescan the system and replace the current configuration" 
+    echo "   -r           This will rescan the system and replace the current configuration"
     echo "                with the scanned data."
     echo ""
     echo "   -h           Well, you've just used that switch, no?"
