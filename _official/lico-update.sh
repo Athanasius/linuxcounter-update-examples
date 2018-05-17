@@ -672,7 +672,7 @@ getUptime() {
 
 getOnlineStatus() {
     if [ "${OS}" = "Linux" ]; then
-        pingstatus=$( ${PING} -q -c 1 linuxcounter.net 2>&1 | ${GREP} -i packet | ${CUT} -d " " -f 1 )
+        pingstatus=$( ${PING} -q -c 1 linuxcounter.net 2>&1 | ${GREP} -i packet | ${AWK} '{print $4}' )
         [ "${pingstatus}" = "" ] && echo "0"
         [ "${pingstatus}" -gt 0 ] && echo "1"
     fi
